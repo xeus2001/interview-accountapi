@@ -403,7 +403,7 @@ definitions:
         minLength: 1
         type: string
       bank_id:
-        description: Local country bank identifier. In the UK this is the sort code.
+        description: Local countryCode bank identifier. In the UK this is the sort code.
         example: '400300'
         pattern: ^[A-Z0-9]{0,16}$
         type: string
@@ -413,7 +413,7 @@ definitions:
         pattern: ^[A-Z]{0,16}$
         type: string
       base_currency:
-        description: ISO 4217 code used to identify the base currency of the account
+        description: ISO 4217 code used to identify the base currencyCode of the account
         example: GBP
         pattern: ^[A-Z]{3}$
         type: string
@@ -1111,7 +1111,7 @@ definitions:
         type: string
         x-parent: data.attributes
       bank_id:
-        description: Local country bank identifier. In the UK this is the sort code.
+        description: Local countryCode bank identifier. In the UK this is the sort code.
         example: '123456'
         pattern: ^[A-Z0-9]+$
         type: string
@@ -1123,7 +1123,7 @@ definitions:
         type: string
         x-parent: data.attributes
       base_currency:
-        description: ISO 4217 code used to identify the base currency of the account
+        description: ISO 4217 code used to identify the base currencyCode of the account
         example: GBP
         pattern: ^[A-Z]{3}$
         type: string
@@ -1485,7 +1485,7 @@ definitions:
             minLength: 1
             type: string
           bank_id:
-            description: Local country bank identifier. In the UK this is the sort
+            description: Local countryCode bank identifier. In the UK this is the sort
               code.
             example: '400300'
             pattern: ^[A-Z0-9]{0,16}$
@@ -1497,7 +1497,7 @@ definitions:
             pattern: ^[A-Z]{0,16}$
             type: string
           base_currency:
-            description: ISO 4217 code used to identify the base currency of the account
+            description: ISO 4217 code used to identify the base currencyCode of the account
             example: GBP
             pattern: ^[A-Z]{3}$
             type: string
@@ -2257,7 +2257,7 @@ definitions:
       acceptance_qualifier:
         $ref: '#/definitions/AcceptanceQualifier'
       bank_id:
-        description: Local country bank identifier. In the UK this is the sort code.
+        description: Local countryCode bank identifier. In the UK this is the sort code.
         example: '400300'
         pattern: ^[A-Z0-9]{1,11}$
         type: string
@@ -2521,7 +2521,7 @@ definitions:
           swift: 71G, Receivers Charges (18)
       receiver_charges_currency:
         description: Currency of `receiver_charges_amount`. Currency code as defined
-          in [ISO 4217](http://www.iso.org/iso/home/standards/currency_codes.htm).
+          in [ISO 4217](http://www.currencyCode.org/currencyCode/home/standards/currency_codes.htm).
         example: EUR
         type: string
         x-availability:
@@ -2552,7 +2552,7 @@ definitions:
                   swift: optional
             currency:
               description: Currency of `amount`. Currency code as defined in [ISO
-                4217](http://www.iso.org/iso/home/standards/currency_codes.htm).
+                4217](http://www.currencyCode.org/currencyCode/home/standards/currency_codes.htm).
               example: EUR
               type: string
               x-availability:
@@ -3016,7 +3016,7 @@ definitions:
         pattern: ^[0-9.]{0,20}$
         type: string
       currency:
-        description: ISO currency code for `amount`
+        description: ISO currencyCode code for `amount`
         type: string
     type: object
     x-access:
@@ -3069,7 +3069,7 @@ definitions:
                 type: array
                 x-parent: data.attributes.beneficiary_party
               country:
-                description: Country of the beneficiary address, ISO 3166 format country
+                description: Country of the beneficiary address, ISO 3166 format countryCode
                   code
                 example: DE
                 type: string
@@ -3125,7 +3125,7 @@ definitions:
             x-parent: data.attributes
           currency:
             description: Currency of the transaction amount. Currency code as defined
-              in [ISO 4217](http://www.iso.org/iso/home/standards/currency_codes.htm)
+              in [ISO 4217](http://www.currencyCode.org/currencyCode/home/standards/currency_codes.htm)
             example: EUR
             type: string
             x-length: 3
@@ -3161,7 +3161,7 @@ definitions:
                 type: array
                 x-parent: data.attributes.debtor_party
               country:
-                description: Country of debtor address. ISO 3166 format country code"
+                description: Country of debtor address. ISO 3166 format countryCode code"
                 example: GB
                 type: string
                 x-parent: data.attributes.debtor_party
@@ -4830,7 +4830,7 @@ definitions:
                 type: string
                 x-parent: data.attributes.charges_amount
               currency:
-                description: ISO currency code for `amount`
+                description: ISO currencyCode code for `amount`
                 example: EUR
                 type: string
                 x-parent: data.attributes.charges_amount
@@ -4860,7 +4860,7 @@ definitions:
                 type: string
                 x-parent: data.attributes.reversal_amount
               currency:
-                description: ISO currency code for `amount`
+                description: ISO currencyCode code for `amount`
                 example: EUR
                 type: string
                 x-parent: data.attributes.reversal_amount
@@ -6430,7 +6430,7 @@ definitions:
         type: string
         x-parent: data.attributes.organisation_identification
       country:
-        description: The country where address of the account holding organisation
+        description: The countryCode where address of the account holding organisation
           is located. Must be ISO 3166-1 code.
         example: GB
         pattern: ^[A-Z]{2}$
@@ -6637,7 +6637,7 @@ definitions:
                     birth can be present.
                 x-length: 35
               birth_country:
-                description: Beneficiary birth country, ISO 3166 format country code
+                description: Beneficiary birth countryCode, ISO 3166 format countryCode code
                 example: FR
                 type: string
                 x-availability:
@@ -6693,7 +6693,7 @@ definitions:
                     swift: required
                 x-length: 30
               country:
-                description: Country of the beneficiary address, ISO 3166 format country
+                description: Country of the beneficiary address, ISO 3166 format countryCode
                   code
                 example: DE
                 type: string
@@ -6826,7 +6826,7 @@ definitions:
             x-length: 6
           currency:
             description: Currency of the transaction amount. Currency code as defined
-              in [ISO 4217](http://www.iso.org/iso/home/standards/currency_codes.htm)
+              in [ISO 4217](http://www.currencyCode.org/currencyCode/home/standards/currency_codes.htm)
             example: EUR
             type: string
             x-availability:
@@ -6927,7 +6927,7 @@ definitions:
                     can be present.
                 x-length: 35
               birth_country:
-                description: Debtor birth country. ISO 3166 format country code
+                description: Debtor birth countryCode. ISO 3166 format countryCode code
                 example: FR
                 type: string
                 x-availability:
@@ -6983,7 +6983,7 @@ definitions:
                     swift: required
                 x-length: 30
               country:
-                description: Country of debtor address. ISO 3166 format country code"
+                description: Country of debtor address. ISO 3166 format countryCode code"
                 example: GB
                 type: string
                 x-availability:
@@ -7129,9 +7129,9 @@ definitions:
                 x-length: 35
               exchange_rate:
                 description: 'Factor used to convert an amount from the instructed
-                  currency into the transaction currency: i.e. to convert the `fx.original_amount`,
+                  currencyCode into the transaction currencyCode: i.e. to convert the `fx.original_amount`,
                   expressed in the `fx.original_currency`, to `amount` specified in
-                  `currency`. Decimal value, represented as a string, maximum length
+                  `currencyCode`. Decimal value, represented as a string, maximum length
                   12. Must be > 0.'
                 example: '0.13343'
                 type: string
@@ -7145,12 +7145,12 @@ definitions:
                     sepa: conditional
                     swift: optional
                 x-description:
-                  sepa: 'If the instructed currency is not `EUR`: `fx.exchange_rate`,
+                  sepa: 'If the instructed currencyCode is not `EUR`: `fx.exchange_rate`,
                     `fx.original_amount` and `fx.original_currency` must be provided'
                   swift: Field 36 Exchange Rate (12)
               original_amount:
                 description: Amount of money to be moved between the debtor and creditor,
-                  before deduction of charges, expressed in the currency as instructed
+                  before deduction of charges, expressed in the currencyCode as instructed
                   by the initiating party. Decimal value. Must be > 0.
                 example: '100.00'
                 type: string
@@ -7164,7 +7164,7 @@ definitions:
                     sepa: conditional
                     swift: optional
                 x-description:
-                  sepa: 'If the instructed currency is not `EUR`: `fx.exchange_rate`,
+                  sepa: 'If the instructed currencyCode is not `EUR`: `fx.exchange_rate`,
                     `fx.original_amount` and `fx.original_currency` must be provided.'
                   swift: 'Field 33B: Currency/instructed amount (18)'
               original_currency:
@@ -7182,7 +7182,7 @@ definitions:
                     sepa: conditional
                     swift: optional
                 x-description:
-                  sepa: 'If the instructed currency is not `EUR`: `fx.exchange_rate`,
+                  sepa: 'If the instructed currencyCode is not `EUR`: `fx.exchange_rate`,
                     `fx.original_amount` and `fx.original_currency` must be provided.'
                   swift: 'Field 33B: Currency/instructed amount (18)'
                 x-length: 3
@@ -8433,7 +8433,7 @@ definitions:
         type: array
         x-parent: data.attributes.private_identification
       birth_country:
-        description: The birth country of the account holder. Must be ISO 3166-1 code.
+        description: The birth countryCode of the account holder. Must be ISO 3166-1 code.
         example: GB
         pattern: ^[A-Z]{2}$
         type: string
@@ -8453,7 +8453,7 @@ definitions:
         type: string
         x-parent: data.attributes.private_identification
       country:
-        description: The country where the postal address of the account holder is
+        description: The countryCode where the postal address of the account holder is
           located. Must be ISO 3166-1 code.
         example: GB
         pattern: ^[A-Z]{2}$
@@ -10951,7 +10951,7 @@ definitions:
                 3 EOF1/Field 3
             x-length: 6
           currency:
-            description: ISO currency code for transaction amount
+            description: ISO currencyCode code for transaction amount
             example: GBP
             type: string
           limit_breach_end_datetime:
@@ -12199,7 +12199,7 @@ definitions:
     enum:
       - closed
       - stopped
-      - currency
+      - currencyCode
       - transferred
       - deceased
       - business_reasons
@@ -12574,7 +12574,7 @@ definitions:
             and place of birth can be present.
         x-length: 35
       birth_country:
-        description: Ultimate debtor/beneficiary birth country. ISO 3166 format country
+        description: Ultimate debtor/beneficiary birth countryCode. ISO 3166 format countryCode
           code
         example: FR
         type: string
@@ -12630,7 +12630,7 @@ definitions:
         x-length: 30
       country:
         description: Country of ultimate debtor/beneficiary address. ISO 3166 format
-          country code
+          countryCode code
         example: GB
         type: string
         x-availability:
@@ -13865,7 +13865,7 @@ paths:
           pattern: ^[A-Z0-9]{0,64}$
           required: false
           type: string
-        - description: Filter by country ISO 3166-1 alpha-2
+        - description: Filter by countryCode ISO 3166-1 alpha-2
           in: query
           minLength: 2
           name: filter[country]
@@ -14205,7 +14205,7 @@ paths:
           required: false
           type: array
         - collectionFormat: csv
-          description: Filter by country e.g. FR,GB
+          description: Filter by countryCode e.g. FR,GB
           in: query
           items:
             type: string

@@ -57,6 +57,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/xeus2001/interview-accountapi/src/f3"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -153,15 +154,14 @@ func main() {
 	if readErr != nil {
 		log.Fatal(readErr)
 	}
-	data := Data{}
+	var data []f3.Account
 	jsonErr := json.Unmarshal(body, &data)
 	if jsonErr != nil {
 		log.Fatal(jsonErr)
 	}
 
-	all := *data.All
-	for d := range all {
-		account := all[d]
+	for d := range data {
+		account := data[d]
 		println(account.ID)
 	}
 
