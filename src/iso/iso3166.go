@@ -4,35 +4,37 @@ import (
 	"encoding/json"
 )
 
-// The 2-letter ISO-3166-1 code.
-type CountryCode string
+// CountryCodeString is the 2-letter ISO-3166-1 code.
+type CountryCodeString string
 
-// The 3-letter ISO-3166-1 code.
+// CountryAlpha3 is the 3-letter ISO-3166-1 code.
 type CountryAlpha3 string
 
-// Basic information about a country.
+// Country holds basic information about a country.
 type Country struct {
-	Code                CountryCode    `json:"alpha2"`
-	Alpha3              CountryAlpha3  `json:"alpha3"`
-	CountryCallingCodes []string       `json:"countryCallingCodes"`
-	Currencies          []CurrencyCode `json:"currencies"`
-	Languages           []string       `json:"languages"`
-	Name                string         `json:"name"`
-	Country             CountryAlpha3  `json:"ioc"`
+	Code   CountryCodeString `json:"alpha2"`
+	Alpha3 CountryAlpha3     `json:"alpha3"`
+	// IocCode is the International Olympic Committee Country Code.
+	IocCode             string               `json:"ioc"`
+	Name                string               `json:"name"`
+	CountryCallingCodes []string             `json:"countryCallingCodes"`
+	Currencies          []CurrencyCodeString `json:"currencies"`
+	Languages           []string             `json:"languages"`
 }
 
 var (
-	// Holds all ISO 3166 countries by their Alpha 2 code.
-	CountryByCode = map[CountryCode]Country{}
+	// CountryByCode holds all ISO 3166 countries by their Alpha 2 code.
+	CountryByCode = map[CountryCodeString]Country{}
 
-	// Holds all ISO 3166 countries by their Alpha 3 code.
+	// CountryByAlpha3 holds all ISO 3166 countries by their Alpha 3 code.
 	CountryByAlpha3 = map[CountryAlpha3]Country{}
 
-	// Holds all ISO 3166 countries by their name.
+	// CountryByName holds all ISO 3166 countries by their name.
 	CountryByName = map[string]Country{}
 )
 
 func init() {
+	// https://opensourcelibs.com/lib/iso-country-data
 	text := `[
   {
     "alpha2": "AC",
@@ -1998,7 +2000,7 @@ func init() {
     "status": "reserved"
   },
   {
-    "alpha2": "ID",
+    "alpha2": "Id",
     "alpha3": "IDN",
     "countryCallingCodes": [
       "+62"
@@ -4827,7 +4829,7 @@ func init() {
   }
 ]
 `
-	parsed := []Country{}
+	var parsed []Country
 	//goland:noinspection GoUnhandledErrorResult
 	json.Unmarshal([]byte(text), &parsed)
 	for index := range parsed {

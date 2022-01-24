@@ -2,27 +2,26 @@ package iso
 
 import "encoding/json"
 
-// The 3-letter ISO 4217 currency code.
-type CurrencyCode string
+// CurrencyCodeString is the 3-letter ISO 4217 currency code.
+type CurrencyCodeString string
 
-// Information about a currency.
+// Currency holds details about a currency.
 type Currency struct {
-	Code     CurrencyCode `json:"code,omitempty"`
-	Decimals int32        `json:"decimals,omitempty"`
-	Name     string       `json:"name,omitempty"`
-	Number   string       `json:"number,omitempty"`
+	Code     CurrencyCodeString `json:"code,omitempty"`
+	Name     string             `json:"name,omitempty"`
+	Number   string             `json:"number,omitempty"`
+	Decimals int                `json:"decimals,omitempty"`
 }
 
 var (
-	// Holds all ISO 4217 currencies by their code.
-	CurrencyByCode = map[CurrencyCode]Currency{}
+	// CurrencyByCode holds all ISO 4217 currencies by their code.
+	CurrencyByCode = map[CurrencyCodeString]Currency{}
 
-	// Holds all ISO 4217 currencies by their name.
+	// CurrencyByName holds all ISO 4217 currencies by their name.
 	CurrencyByName = map[string]Currency{}
 )
 
 func init() {
-	// Workaround to at least have a full list.
 	// https://github.com/OpenBookPrices/country-data/tree/master/data
 	text := `[
   {

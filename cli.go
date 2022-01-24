@@ -43,6 +43,27 @@ SECURITY
 	https://github.com/securego/gosec
 	https://staticcheck.io/
 
+NETWORKING
+	https://iximiuz.com/en/posts/go-net-http-setsockopt-example/
+	https://go.dev/doc/database/cancel-operations
+	https://astaxie.gitbooks.io/build-web-application-with-golang/content/en/
+	https://github.com/SrijanSriv/gonetworking
+
+MEMORY / GC
+	reflect/value.go
+	builtin/builtin.go
+	https://mdlayher.com/blog/unsafe-string-interning-in-go/
+	https://go101.org/article/unsafe.html
+	Sick: No weak references in Go!
+		see: https://github.com/golang/go/issues/43615						!!!!! Implement a weak map
+	https://golangbyexample.com/understanding-uintptr-golang/
+	https://pkg.go.dev/sync/atomic
+	https://github.com/go4org/intern/blob/main/intern.go
+
+GENERICS
+	https://www.infoq.com/news/2021/12/go-generics-beta/
+	https://www.infoq.com/news/2021/06/go-fuzzing-beta/
+
 JSON
 	https://blog.alexellis.io/golang-json-api-client/
 	https://www.geeksforgeeks.org/how-to-parse-json-in-golang/
@@ -55,13 +76,7 @@ CURL
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/xeus2001/interview-accountapi/src/f3"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"time"
 )
 
 var test = "Hello World"
@@ -132,88 +147,110 @@ func printSpeed(control SpeedControl) {
 	client.Ping()
 	client.Do(Request) Response
 */
+
+//func old() {
+//	url := "http://localhost:8080/v1/organisation/accounts"
+//	client := http.Client{
+//		Timeout: time.Second * 2,
+//	}
+//	req, err := http.NewRequest(http.MethodGet, url, nil)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	req.Header.Set("User-Agent", "FooLib")
+//	req.Header.Set("Accept", "application/json")
+//	res, getErr := client.Do(req)
+//	if getErr != nil {
+//		log.Fatal(getErr)
+//	}
+//	if res.Body != nil {
+//		defer res.Body.Close()
+//	}
+//	body, readErr := ioutil.ReadAll(res.Body)
+//	if readErr != nil {
+//		log.Fatal(readErr)
+//	}
+//	var data []main2.Account
+//	jsonErr := json.Unmarshal(body, &data)
+//	if jsonErr != nil {
+//		log.Fatal(jsonErr)
+//	}
+//
+//	for d := range data {
+//		account := data[d]
+//		println(account.Id)
+//	}
+//
+//	myCar := Car{Vehicle{Name: "Hello"}, 32, 0}
+//	println(myCar.vehicle.Name)
+//	testPrint(&myCar.vehicle)
+//	var buh int32 = 0
+//	defer fmt.Printf("%d\n", buh)
+//	buh++
+//	defer fmt.Printf("%d\n", buh)
+//	buh++
+//	defer fmt.Printf("%d\n", buh)
+//	buh++
+//	defer fmt.Printf("%d\n", buh)
+//	buh++
+//	defer fmt.Printf("We expect that after this text 3, 2, 1 and 0 follow\n")
+//	if myCar.age+5 < 100 {
+//		buh++
+//	}
+//	fmt.Printf("Hello %s %d\n", myCar.vehicle.Name, buh)
+//	myCar.Hello("Cool")
+//	myCar.addSpeed(10)
+//	var xxx SpeedControl = &myCar
+//	printSpeed(xxx)
+//
+//	s := []string{0: "no error", 4: "Eio", 7: "invalid argument"}
+//	for key, value := range s {
+//		fmt.Printf("%d = %s, ", key, value)
+//	}
+//	println()
+//	d := map[int32]string{0: "no error", 4: "Eio", 7: "invalid argument"}
+//	for key, value := range d {
+//		fmt.Printf("%d = %s, ", key, value)
+//	}
+//	println()
+//	f := [...]float64{7.0, 8.5, 9.1}
+//	f2 := f[2:3]
+//	fmt.Printf("len(f) = %d, %d\n", len(f), len(f2))
+//	fmt.Printf("f[0]=%f, f2[0]=%f\n", f[0], f2[0])
+//
+//	myCar.vehicle.Name = "first"
+//	myCar.age = 1
+//	pMyCar := &myCar
+//	pMyCar.age = 2
+//	pMyCar.vehicle.Name = "second"
+//	pMyCar2 := &myCar
+//	pMyCar2.age = 3
+//	pMyCar2.vehicle.Name = "third"
+//	println(myCar.vehicle.Name)
+//	println(myCar.age)
+//	println(pMyCar.vehicle.Name)
+//	println(pMyCar.age)
+//	println(pMyCar2.vehicle.Name)
+//	println(pMyCar2.age)
+//}
+
+type TestA struct {
+	v string
+}
+
+type TestB struct {
+	v TestA
+}
+
 func main() {
-	url := "http://localhost:8080/v1/organisation/accounts"
-	client := http.Client{
-		Timeout: time.Second * 2,
-	}
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	req.Header.Set("User-Agent", "FooLib")
-	req.Header.Set("Accept", "application/json")
-	res, getErr := client.Do(req)
-	if getErr != nil {
-		log.Fatal(getErr)
-	}
-	if res.Body != nil {
-		defer res.Body.Close()
-	}
-	body, readErr := ioutil.ReadAll(res.Body)
-	if readErr != nil {
-		log.Fatal(readErr)
-	}
-	var data []f3.Account
-	jsonErr := json.Unmarshal(body, &data)
-	if jsonErr != nil {
-		log.Fatal(jsonErr)
-	}
-
-	for d := range data {
-		account := data[d]
-		println(account.ID)
-	}
-
-	myCar := Car{Vehicle{Name: "Hello"}, 32, 0}
-	println(myCar.vehicle.Name)
-	testPrint(&myCar.vehicle)
-	var buh int32 = 0
-	defer fmt.Printf("%d\n", buh)
-	buh++
-	defer fmt.Printf("%d\n", buh)
-	buh++
-	defer fmt.Printf("%d\n", buh)
-	buh++
-	defer fmt.Printf("%d\n", buh)
-	buh++
-	defer fmt.Printf("We expect that after this text 3, 2, 1 and 0 follow\n")
-	if myCar.age+5 < 100 {
-		buh++
-	}
-	fmt.Printf("Hello %s %d\n", myCar.vehicle.Name, buh)
-	myCar.Hello("Cool")
-	myCar.addSpeed(10)
-	var xxx SpeedControl = &myCar
-	printSpeed(xxx)
-
-	s := []string{0: "no error", 4: "Eio", 7: "invalid argument"}
-	for key, value := range s {
-		fmt.Printf("%d = %s, ", key, value)
-	}
+	//old()
+	a := TestA{"hello"}
+	pA := &a.v
+	b := TestA{"hello"}
+	pB := &b.v
+	c := TestB{TestA{"hello"}}
+	println(a == b)
+	println(a == c.v)
+	println(pA == pB)
 	println()
-	d := map[int32]string{0: "no error", 4: "Eio", 7: "invalid argument"}
-	for key, value := range d {
-		fmt.Printf("%d = %s, ", key, value)
-	}
-	println()
-	f := [...]float64{7.0, 8.5, 9.1}
-	f2 := f[2:3]
-	fmt.Printf("len(f) = %d, %d\n", len(f), len(f2))
-	fmt.Printf("f[0]=%f, f2[0]=%f\n", f[0], f2[0])
-
-	myCar.vehicle.Name = "first"
-	myCar.age = 1
-	pMyCar := &myCar
-	pMyCar.age = 2
-	pMyCar.vehicle.Name = "second"
-	pMyCar2 := &myCar
-	pMyCar2.age = 3
-	pMyCar2.vehicle.Name = "third"
-	println(myCar.vehicle.Name)
-	println(myCar.age)
-	println(pMyCar.vehicle.Name)
-	println(pMyCar.age)
-	println(pMyCar2.vehicle.Name)
-	println(pMyCar2.age)
 }

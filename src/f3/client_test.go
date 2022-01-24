@@ -66,9 +66,9 @@ func TestCountry(t *testing.T) {
 }
 
 func TestNewId(t *testing.T) {
-	uuid, err := f3.NewId()
+	uuid, err := f3.NewUuid()
 	if err != nil {
-		t.Fatal("Failed to create unique ID for new account")
+		t.Fatal("Failed to create unique Id for new account")
 	}
 	if uuid == nil {
 		t.Fatal("Failed to create UUID")
@@ -94,7 +94,7 @@ func TestNewAccount(t *testing.T) {
 func TestClient_IsHealthy(t *testing.T) {
 	client, err := f3.NewClient(*hostname, port, time.Second*5)
 	if err != nil {
-		t.Fatalf("Creating the F3 client failed, reason: %s", err.Error())
+		t.Fatalf("Creating the F3 client failed, cause: %s", err.Error())
 	}
 	if !client.IsHealthy() {
 		t.Fatalf("Health check for service failed")
@@ -104,7 +104,7 @@ func TestClient_IsHealthy(t *testing.T) {
 func TestClient_CreateAccount(t *testing.T) {
 	client, e := f3.NewClient(*hostname, port, time.Second*5)
 	if e != nil {
-		t.Fatalf("Creating the F3 client failed, reason: %s", e.Error())
+		t.Fatalf("Creating the F3 client failed, cause: %s", e.Error())
 	}
 	account, e := f3.NewAccount(
 		nil,

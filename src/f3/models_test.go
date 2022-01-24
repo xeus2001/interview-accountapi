@@ -1,17 +1,16 @@
 package f3_test
 
 import (
-	"github.com/xeus2001/interview-accountapi/src/f3"
 	"testing"
 )
 
 func TestAccountAttr_SetStatus(t *testing.T) {
-	attr := f3.AccountAttr{}
-	err := attr.SetStatus(f3.StatusClosed, "must be ignored")
+	attr := main.AccountAttr{}
+	err := attr.SetStatus(main.StatusClosed, "must be ignored")
 	if err != nil {
 		t.Errorf("Setting StatusClosed failed, but must not, reason: %s", err.Error())
 	} else {
-		if attr.Status == nil || *attr.Status != f3.StatusClosed {
+		if attr.Status == nil || *attr.Status != main.StatusClosed {
 			t.Error("Settings StatusClosed failed")
 		}
 		if attr.StatusReason != nil {
@@ -19,11 +18,11 @@ func TestAccountAttr_SetStatus(t *testing.T) {
 		}
 	}
 
-	err = attr.SetStatus(f3.StatusFailed, "Required")
+	err = attr.SetStatus(main.StatusFailed, "Required")
 	if err != nil {
 		t.Errorf("Setting StatusFailed failed, but must not, reason: %s", err.Error())
 	} else {
-		if attr.Status == nil || *attr.Status != f3.StatusFailed {
+		if attr.Status == nil || *attr.Status != main.StatusFailed {
 			t.Error("Settings StatusFailed failed")
 		}
 		if attr.StatusReason == nil || *attr.StatusReason != "Required" {
@@ -31,7 +30,7 @@ func TestAccountAttr_SetStatus(t *testing.T) {
 		}
 	}
 
-	err = attr.SetStatus(f3.StatusFailed, "")
+	err = attr.SetStatus(main.StatusFailed, "")
 	if err == nil {
 		t.Errorf("Setting StatusFailed with empty reason, this operation must fail")
 	}

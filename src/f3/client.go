@@ -6,22 +6,9 @@ import (
 	"fmt"
 	uuid "github.com/nu7hatch/gouuid"
 	"github.com/xeus2001/interview-accountapi/src/iso"
-
-	//	"github.com/nu7hatch/gouuid"
 	"io/ioutil"
 	"net/http"
-	"time"
 )
-
-// The default organization identifier to be used, when a new account is created.
-var DefaultOrganizationId *uuid.UUID = nil
-
-func init() {
-	uuid, err := uuid.ParseHex("f8e803fe-6962-4811-94dc-e558610cbe78")
-	if err == nil {
-		DefaultOrganizationId = uuid
-	}
-}
 
 const (
 	headerUserAgent   = "User-Agent"
@@ -38,68 +25,55 @@ type healthyResponse struct {
 	Status *string `json:"status,omitempty"`
 }
 
-// Creates a new random identifier. THis can be used for accounts, organizations and others unique identifiers.
-func NewId() (*uuid.UUID, Err) {
-	v4, e := uuid.NewV4()
-	if e != nil {
-		return nil, err{ErrUnknown, e.Error()}
-	}
-	return v4, nil
-}
-
 // Create a new account and fills it with default values. The created structure can be modified or directly used
 // to create a new account. The country is required and dependent on the country the bank-id may be required too.
-// If the provided country is not eligible for default values and error is returned. In this case the account structure
+// If the provided country is not eligible for default values and err is returned. In this case the account structure
 // must be created manually.
 func NewAccount(
 	organizationId *uuid.UUID,
-	countryCode iso.CountryCode,
+	countryCode iso.CountryCodeString,
 	bankId string,
 	accountHolderName []string,
 	accountNumber string,
 	customerId string,
 ) (*Account, Err) {
-	restrictions := BankRestrictionsByCountry(countryCode)
+	restrictions := GetBankVerifier(countryCode)
 	if restrictions == nil {
-		return nil, err{ErrCountryUnknown, msgCountryUnknown}
+		return nil, err{ErrNoVerifierAvailableForCountry, msgCountryUnknown, nil}
 	}
 	country, ok := iso.CountryByCode[countryCode]
 	if !ok {
-		return nil, err{ErrCountryUnknown, msgCountryUnknown}
+		return nil, err{ErrNoVerifierAvailableForCountry, msgCountryUnknown, nil}
 	}
 	pAccount := new(Account)
-	id, e := NewId()
+	id, e := NewUuid()
 	if e != nil {
 		return nil, e
 	}
-	pAccount.ID = id.String()
+	pAccount.Id = id.String()
 	if organizationId == nil {
 		if DefaultOrganizationId == nil {
-			return nil, err{ErrInvalidUuid, msgInvalidUuid}
+			return nil, err{ErrInvalidUuid, msgInvalidUuid, nil}
 		}
 		organizationId = DefaultOrganizationId
 	}
-	pAccount.OrganisationID = organizationId.String()
+	pAccount.OrganisationId = organizationId.String()
 	pAccount.Attr = new(AccountAttr)
 	attr := pAccount.Attr
-	e = attr.SetStatus(StatusConfirmed, "")
-	if e != nil {
-		return nil, e
-	}
+	attr.SetStatusConfirmed()
 	attr.Country = countryCode
 	currencies := country.Currencies
 	if len(currencies) > 0 {
-		currencyCode := currencies[0]
-		attr.BaseCurrency = &currencyCode
+		attr.BaseCurrency = currencies[0]
 	}
 	e = restrictions.ValidateBankId(bankId)
 	if e != nil {
 		return nil, e
 	}
-	attr.BankID = bankId
-	bankIdCode := restrictions.BankIdCode()
+	attr.BankId = bankId
+	bankIdCode := restrictions.BankCode()
 	if bankIdCode != nil {
-		attr.BankIDCode = *bankIdCode
+		attr.BankIdCode = *bankIdCode
 	}
 	// TODO: Name of the account holder, up to four lines possible.
 	//
@@ -116,32 +90,29 @@ func NewAccount(
 	return pAccount, nil
 }
 
-// Create a new Form3 client for the given host and port using the given request timeout.
-func NewClient(host string, port int32, timeout time.Duration) (*Client, Err) {
-	if len(host) == 0 {
-		return nil, err{ErrEmptyHostName, msgEmptyHostName}
-	}
-	if port < 1 || port > 65535 {
-		return nil, err{ErrIllegalPort, msgIllegalPort}
-	}
-	//goland:noinspection HttpUrlsUsage
-	client := Client{host: host, port: port, endpoint: fmt.Sprintf("http://%s:%d/v1", host, port), httpClient: http.Client{Timeout: timeout}}
+// NewClient creates a new Form3 client for the given endpoint using default settings.
+func NewClient(endpoint string) *Client {
+	client := Client{endpoint: endpoint, httpClient: http.Client{Timeout: DefaultTimeout, Transport: DefaultTransport}}
 	client.healthCheckUri = fmt.Sprintf("%s/health", client.endpoint)
 	client.accountUri = fmt.Sprintf("%s/organisation/accounts", client.endpoint)
-	return &client, nil
+	return &client
 }
 
-// Client is a structure to store options needed to access a specific Form3 service. This object is stateless.
+// Client is an abstraction above a http.Client bound to a specific Form3 endpoint.
 type Client struct {
-	host           string
-	port           int32
 	endpoint       string
 	healthCheckUri string
 	accountUri     string
 	httpClient     http.Client
 }
 
-// Test if the service is alive and responsive within the set request timeout.
+// HttpClient returns the underlying http client being used. If the default created by NewClient is not sufficient,
+// modify this before using.
+func (c *Client) HttpClient() http.Client {
+	return c.httpClient
+}
+
+// IsHealthy test if the service is alive and responsive within the set request timeout.
 func (c *Client) IsHealthy() bool {
 	req, err := http.NewRequest(http.MethodGet, c.healthCheckUri, nil)
 	if err != nil {
@@ -175,18 +146,18 @@ func (c *Client) IsHealthy() bool {
 
 func (c *Client) CreateAccount(account *Account) (*Account, Err) {
 	if account == nil {
-		return nil, err{ErrAccountNil, msgAccountNil}
+		return nil, err{ErrAccountNil, msgAccountNil, nil}
 	}
-	accounts := Accounts{Data: make([]*Account, 1)}
+	accounts := AccountsEnvelope{Data: make([]*Account, 1)}
 	accounts.Data[0] = account
 	jsonBytes, e := json.Marshal(accounts)
 	if e != nil {
-		return nil, err{ErrJsonStringify, e.Error()}
+		return nil, err{ErrJsonStringify, e.Error(), e}
 	}
 
 	req, e := http.NewRequest(http.MethodPost, c.accountUri, bytes.NewBuffer(jsonBytes))
 	if e != nil {
-		return nil, err{ErrUnknown, e.Error()}
+		return nil, err{ErrUnknown, e.Error(), e}
 	}
 	req.Header.Set(headerUserAgent, userAgentName)
 	req.Header.Set(headerContentType, mimeApplicationJson)
@@ -194,28 +165,28 @@ func (c *Client) CreateAccount(account *Account) (*Account, Err) {
 	resp, e := c.httpClient.Do(req)
 	if e != nil {
 		// How do we know why this request failed?
-		return nil, err{ErrRequest, e.Error()}
+		return nil, err{ErrRequest, e.Error(), e}
 	}
 	if resp.Body == nil {
-		return nil, err{ErrRequest, msgMissingBody}
+		return nil, err{ErrRequest, msgMissingBody, nil}
 	}
 	//goland:noinspection GoUnhandledErrorResult
 	defer resp.Body.Close()
 	body, e := ioutil.ReadAll(resp.Body)
 	if e != nil {
-		return nil, err{ErrRequest, e.Error()}
+		return nil, err{ErrRequest, e.Error(), e}
 	}
 	e = json.Unmarshal(body, &accounts)
 	if e != nil {
 		var errResponse *ErrorResponse
 		e = json.Unmarshal(body, &errResponse)
 		if e != nil {
-			return nil, err{ErrJsonParse, e.Error()}
+			return nil, err{ErrJsonParse, e.Error(), e}
 		}
-		return nil, err{ErrResponse, errResponse.ErrorMessage}
+		return nil, err{ErrResponse, errResponse.ErrorMessage, e}
 	}
 	if len(accounts.Data) != 1 {
-		return nil, err{ErrResponse, msgInvalidResponse}
+		return nil, err{ErrResponse, msgInvalidResponse, nil}
 	}
 	return accounts.Data[0], nil
 }
