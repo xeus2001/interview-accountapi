@@ -15,8 +15,11 @@ type Country struct {
 	Code   CountryCodeString `json:"alpha2"`
 	Alpha3 CountryAlpha3     `json:"alpha3"`
 	// IocCode is the International Olympic Committee Country Code.
-	IocCode             string               `json:"ioc"`
-	Name                string               `json:"name"`
+	IocCode    string `json:"ioc"`
+	Name       string `json:"name"`
+	BankIdCode string
+	// Emoji holds the UTF-8 encoded code point of the country flag; if any.
+	Emoji               string               `json:"emoji"`
 	CountryCallingCodes []string             `json:"countryCallingCodes"`
 	Currencies          []CurrencyCodeString `json:"currencies"`
 	Languages           []string             `json:"languages"`
@@ -34,7 +37,10 @@ var (
 )
 
 func init() {
+	// This is downloaded from:
 	// https://opensourcelibs.com/lib/iso-country-data
+	// However, it should be loaded from a Form 3 servers, enriched with more information like is a bank-code required,
+	// what is the required length of the bank-id and so on.
 	text := `[
   {
     "alpha2": "AC",
@@ -4830,18 +4836,31 @@ func init() {
 ]
 `
 	var parsed []Country
-	//goland:noinspection GoUnhandledErrorResult
-	json.Unmarshal([]byte(text), &parsed)
-	for index := range parsed {
-		iso3166 := parsed[index]
-		if len(iso3166.Name) > 0 {
-			CountryByName[iso3166.Name] = iso3166
+	e := json.Unmarshal([]byte(text), &parsed)
+	if e != nil {
+		panic(any(e))
+	}
+	if parsed != nil {
+		for index := range parsed {
+			iso3166 := parsed[index]
+			if len(iso3166.Name) > 0 {
+				CountryByName[iso3166.Name] = iso3166
+			}
+			if len(iso3166.Code) == 2 {
+				CountryByCode[iso3166.Code] = iso3166
+			}
+			if len(iso3166.Alpha3) == 3 {
+				CountryByAlpha3[iso3166.Alpha3] = iso3166
+			}
 		}
-		if len(iso3166.Code) == 2 {
-			CountryByCode[iso3166.Code] = iso3166
-		}
-		if len(iso3166.Alpha3) == 3 {
-			CountryByAlpha3[iso3166.Alpha3] = iso3166
-		}
+	}
+	if gb, ok := CountryByCode["GB"]; ok {
+		gb.BankIdCode = "GBDSC"
+	}
+	if de, ok := CountryByCode["DE"]; ok {
+		de.BankIdCode = "DEBLZ"
+	}
+	if de, ok := CountryByCode["US"]; ok {
+		de.BankIdCode = "CHBCC"
 	}
 }

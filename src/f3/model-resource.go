@@ -17,11 +17,11 @@ type Resource struct {
 	// is automatically set to 0. Whenever the content of the resource changes, the value of version is increased.
 	// Used for concurrency control in Patch and Delete methods to avoid modifying an older version of the record that
 	// has already been changed (err.g. by an internal process at Form3).
-	Version *int64 `json:"version,omitempty"` // Note: It needs to be a pointer, because we need to differ between missing and 0
+	Version *uint64 `json:"version,omitempty"` // Note: It needs to be a pointer, because we need to differ between missing and 0
 
 	// CreatedOn is the time when the record was created, set server side.
-	CreatedOn time.Time `json:"created_on,omitempty"`
+	CreatedOn *time.Time `json:"created_on,omitempty"`
 
 	// ModifiedOn is the time when the record was last modified, set server side.
-	ModifiedOn time.Time `json:"modified_on,omitempty"`
+	ModifiedOn *time.Time `json:"modified_on,omitempty"`
 }

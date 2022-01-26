@@ -16,6 +16,10 @@ type err struct {
 	cause   error
 }
 
+func pErr(e err) *err {
+	return &e
+}
+
 // Error returns the human-readable err message.
 func (e err) Error() string {
 	return fmt.Sprintf("[%d] %s", e.code, e.message)
