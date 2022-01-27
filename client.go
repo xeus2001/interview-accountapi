@@ -1,4 +1,4 @@
-package interview_accountapi
+package f3
 
 import (
 	"bytes"
@@ -19,9 +19,9 @@ const (
 	mimeForm3Json       = "application/vnd.api+json"
 )
 
-// NewClient creates a new Form3 client for the given endpoint using default settings.
-func NewClient(endpoint string) *Client {
-	client := Client{endpoint: endpoint, httpClient: http.Client{Timeout: DefaultTimeout, Transport: DefaultTransport}}
+// NewClient creates a new Form3 client bound to the production endpoint and setup with defaults.
+func NewClient() *Client {
+	client := Client{endpoint: *DefaultEndPoint, httpClient: http.Client{Timeout: DefaultTimeout, Transport: DefaultTransport}}
 	client.healthCheckUri = fmt.Sprintf("%s/health", client.endpoint)
 	client.accountUri = fmt.Sprintf("%s/organisation/accounts", client.endpoint)
 	return &client
@@ -33,6 +33,14 @@ type Client struct {
 	healthCheckUri string
 	accountUri     string
 	httpClient     http.Client
+}
+
+// WithEndPoint rebinds the endpoint of the client.
+func (c *Client) WithEndPoint(endpoint string) *Client {
+	c.endpoint = endpoint
+	c.healthCheckUri = fmt.Sprintf("%s/health", endpoint)
+	c.accountUri = fmt.Sprintf("%s/organisation/accounts", endpoint)
+	return c
 }
 
 // HttpClient returns the underlying http client being used. If the default created by NewClient is not sufficient,

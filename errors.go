@@ -1,4 +1,4 @@
-package interview_accountapi
+package f3
 
 import (
 	"fmt"
