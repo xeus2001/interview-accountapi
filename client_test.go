@@ -1,12 +1,15 @@
-package f3_test
+//go:build int
+// +build int
+
+package interview_accountapi_test
 
 import (
-	"github.com/xeus2001/interview-accountapi/src/f3"
+	"github.com/xeus2001/interview-accountapi"
 	"testing"
 )
 
-func createTestClient() *f3.Client {
-	return f3.NewClient(f3.IntegrationEndPoint)
+func createTestClient() *interview_accountapi.Client {
+	return interview_accountapi.NewClient(interview_accountapi.IntegrationEndPoint)
 }
 
 func TestClient_IsHealthy(t *testing.T) {
@@ -19,7 +22,7 @@ func TestClient_IsHealthy(t *testing.T) {
 func TestClient_CreateAccount(t *testing.T) {
 	client := createTestClient()
 	account := createTestAccount()
-	account.Id = f3.IntegrationTestAccountId
+	account.Id = interview_accountapi.IntegrationTestAccountId
 	created, e := client.CreateAccount(account)
 	if e != nil {
 		t.Fatalf("Failed to create test account: %s", e.Error())
@@ -31,16 +34,7 @@ func TestClient_CreateAccount(t *testing.T) {
 
 func TestClient_FetchAccount(t *testing.T) {
 	client := createTestClient()
-	account := createTestAccount()
-	account.Id = f3.IntegrationTestAccountId
-	created, e := client.CreateAccount(account)
-	if e != nil {
-		t.Errorf("Failed to create test account: %s", e.Error())
-	}
-	if created == nil {
-		t.Errorf("Received nil as created account")
-	}
-	fetched, e := client.FetchAccount(f3.IntegrationTestAccountId)
+	fetched, e := client.FetchAccount(interview_accountapi.IntegrationTestAccountId)
 	if e != nil {
 		t.Fatalf("Failed to fetch test account: %s", e.Error())
 	}
@@ -51,7 +45,7 @@ func TestClient_FetchAccount(t *testing.T) {
 
 func TestClient_DeleteAccount(t *testing.T) {
 	client := createTestClient()
-	e := client.DeleteAccount(f3.IntegrationTestAccountId, 0)
+	e := client.DeleteAccount(interview_accountapi.IntegrationTestAccountId, 0)
 	if e != nil {
 		t.Errorf("Deleting the test account failed, reason: %s", e.Error())
 	}

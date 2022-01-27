@@ -1,4 +1,4 @@
-package f3
+package interview_accountapi
 
 import (
 	"github.com/google/uuid"

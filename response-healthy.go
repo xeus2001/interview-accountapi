@@ -1,4 +1,4 @@
-package f3
+package interview_accountapi
 
 // HealthyResponse is returned by the health-check request.
 type HealthyResponse struct {
