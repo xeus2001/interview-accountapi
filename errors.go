@@ -67,40 +67,4 @@ const (
 
 	// ErrResponse signals that the response is erroneous.
 	ErrResponse int = iota
-
-	// ErrUuidCreationFailed is returned when creating a UUID fails.
-	ErrUuidCreationFailed int = iota
-
-	// ErrNoVerifierAvailableForCountry is returned when there is no verifier available for the requested country.
-	ErrNoVerifierAvailableForCountry int = iota
-
-	// ErrBankIdMissing is returned when a bank-id is required, but none was given.
-	ErrBankIdMissing int = iota
-
-	// ErrBankIdTooShort is returned when a bank-id is too short.
-	ErrBankIdTooShort int = iota
-
-	// ErrBankIdTooLong is returned when a bank-id is too long.
-	ErrBankIdTooLong int = iota
-
-	ErrEmptyHostName       int = iota // Returned when a new client is created with an empty host name.
-	ErrIllegalPort         int = iota // Returned when a new client is given with an invalid port.
-	ErrInvalidUuid         int = iota // When an identifier must be a UUID and is not valid UUID string.
-	ErrInvalidStatus       int = iota // When an invalid status is given
-	ErrMissingStatusReason int = iota // When a status with mandatory cause is given without cause.
-)
-
-// Internally used as default message.
-const (
-	msgUnknownErrorWhileCreatingMessage = "Unknown error while creating the request"
-	msgAccountNil                       = "The account object is nil"
-	msgUuidCreationFailed               = "UUID creation failed"
-	msgEmptyHostName                    = "Empty hostname"
-	msgIllegalPort                      = "Illegal port, must be a value between 1 and 65535"
-	msgInvalidUuid                      = "Invalid UUID format"
-	msgMissingStatusReason              = "The status 'failed' requires that a cause is given"
-	msgCountryUnknown                   = "The given country is not well defined in the client, manual setup is required"
-	msgBankIdMissing                    = "Empty (missing) bank-id given, but a valid bank-id is required in this country"
-	msgMissingBody                      = "Missing body"
-	msgInvalidResponse                  = "Invalid response"
 )
