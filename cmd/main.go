@@ -1,8 +1,12 @@
 package main
 
-import "github.com/xeus2001/interview-accountapi/pkg/f3"
+import (
+	"fmt"
+	"github.com/xeus2001/interview-accountapi/pkg/f3"
+)
 
 func main() {
-	client := f3.NewClient().WithEndPoint("http://localhost:8080/v1")
+	fmt.Printf("Try health-check at endpoint: %s\n", f3.DefaultEndPoint)
+	client := f3.NewClient()
 	println(client.IsHealthy())
 }

@@ -11,12 +11,14 @@ import (
 	"time"
 )
 
-var wait = flag.Int("f3.wait", 15, "The time to wait for the account API in seconds")
+var (
+	wait     = flag.Int("f3.wait", 15, "The time to wait for the account API in seconds")
+	endpoint = flag.String("f3.endpoint", f3.DefaultEndPoint, "Override the default endpoint for clients")
+)
 
 func TestClient(t *testing.T) {
-	fmt.Printf("Execute integration tests against endpoint: '%s'\n", *f3.DefaultEndPoint)
-	client := f3.NewClient()
-	client.WithEndPoint(*f3.DefaultEndPoint)
+	fmt.Printf("Execute integration tests against endpoint: '%s'\n", *endpoint)
+	client := f3.NewClient().WithEndPoint(*endpoint)
 
 	// Wait for endpoint
 	WAIT_MAX := time.Second * time.Duration(*wait)

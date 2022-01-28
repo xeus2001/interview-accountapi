@@ -1,23 +1,23 @@
-# PATH := $(PATH):$(shell echo $$GOPATH/bin)
 GOBIN := $(shell pwd)/bin
-LIBNAME := libf3
-EXECNAME := f3
 SRC := $(shell find . -type f -name '*.go' -path "./pkg/f3/*")
 VERSION := $(shell cat pkg/f3/version.go |grep "const Version ="|cut -d"\"" -f2)
 GIT_COMMIT := $(shell git rev-parse HEAD)
-TARGET := $(shell echo $${PWD})
-LDFLAGS=-ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(GIT_COMMIT)"
+LIBNAME := libf3
+EXENAME := f3
 
-$(TARGET): $(SRC)
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go build $(LDFLAGS) -o $(TARGET)
+build: FLAGS := -ldflags "-X github.com/xeus2001/interview-accountapi/pkg/f3.DefaultEndPoint=http://localhost:8080/v1"
+release: FLAGS := -ldflags "-X github.com/xeus2001/interview-accountapi/pkg/f3.DefaultEndPoint=https://api.f3.tech/v1"
 
-build:
+build: do-build
+release: do-build
+
+do-build:
 	@echo "GOPATH: $(GOPATH)"
-	@echo "LDFLAGS: $(LDFLAGS)"
+	@echo "LDFLAGS: $(FLAGS)"
 	@echo "FILES: $(SRC)"
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go build $(LDFLAGS) -o bin/$(LIBNAME) cmd/main.go
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -o bin/$(EXECNAME) cmd/main.go
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) GOOS=windows GOARCH=amd64 go build $(LDFLAGS) -o bin/$(EXECNAME).exe cmd/main.go
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go build $(FLAGS) -o bin/$(LIBNAME) cmd/main.go
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) GOOS=linux GOARCH=amd64 go build $(FLAGS) -o bin/$(EXENAME) cmd/main.go
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) GOOS=windows GOARCH=amd64 go build $(FLAGS) -o bin/$(EXENAME).exe cmd/main.go
 
 docs: fmt
 	gomarkdoc --output doc/f3.md pkg/f3/*.go
@@ -40,8 +40,9 @@ get:
 
 clean:
 	@rm -f bin/$(LIBNAME)
-	@rm -f bin/$(EXECNAME)
-	@rm -f bin/$(EXECNAME).exe
+	@rm -f bin/$(EXENAME)
+	@rm -f bin/$(EXENAME).exe
+	@docker image rm f3.int.test:latest 2>/dev/null || true
 
 simplify:
 	@gofmt -s -l -w $(SRC)
@@ -52,4 +53,4 @@ test:
 test-int:
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go test -tags=int -v github.com/xeus2001/interview-accountapi/pkg/f3 -f3.endpoint=http://localhost:8080/v1
 
-.PHONY: all build docs fmt check get simplify test test-int open-swagger-ui
+.PHONY: all build release do-build docs open-swagger-ui fmt check get clean simplify test test-int

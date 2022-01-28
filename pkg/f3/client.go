@@ -21,7 +21,7 @@ const (
 
 // NewClient creates a new Form3 client bound to the production endpoint and setup with defaults.
 func NewClient() *Client {
-	client := Client{endpoint: *DefaultEndPoint, httpClient: http.Client{Timeout: DefaultTimeout, Transport: DefaultTransport}}
+	client := Client{endpoint: DefaultEndPoint, httpClient: http.Client{Timeout: DefaultTimeout, Transport: DefaultTransport}}
 	client.healthCheckUri = fmt.Sprintf("%s/health", client.endpoint)
 	client.accountUri = fmt.Sprintf("%s/organisation/accounts", client.endpoint)
 	return &client

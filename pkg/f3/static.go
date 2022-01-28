@@ -1,15 +1,14 @@
 package f3
 
 import (
-	"flag"
 	"net"
 	"net/http"
 	"time"
 )
 
 var (
-	// DefaultEndPoint is the default endpoint to connect the client to.
-	DefaultEndPoint = flag.String("f3.endpoint", "https://api.f3.tech/v1", "Set the default endpoint")
+	// DefaultEndPoint is the default endpoint that f3.NewClient will use.
+	DefaultEndPoint = "https://api.f3.tech/v1"
 
 	// DefaultTimeout is the default timeout to be used for the http client.
 	DefaultTimeout = time.Second * 5

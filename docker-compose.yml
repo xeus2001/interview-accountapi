@@ -65,4 +65,7 @@ services:
       - accountapi
     links:
       - accountapi
-    entrypoint: ["go", "test", "-v", "-tags=int", "--f3.endpoint=http://accountapi:8080/v1"]
+    command:
+      - "--f3.endpoint=http://accountapi:8080/v1"
+
+#    entrypoint: ["go", "test", "-v", "-tags=int", ]
