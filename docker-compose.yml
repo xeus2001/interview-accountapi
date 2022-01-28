@@ -42,8 +42,22 @@ services:
       - SKIP_SETCAP=1
       - VAULT_DEV_ROOT_TOKEN_ID=8fb95528-57c6-422e-9722-d2147bcba8ed
 
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: swagger_ui_container
+    ports:
+      - 7080:8080
+    volumes:
+      - ./api:/usr/share/nginx/html/doc
+    depends_on:
+      - accountapi
+    links:
+      - accountapi
+    environment:
+      API_URL: doc/form3-swagger.yaml
+
   test:
-    image: "form3.integration.test"
+    image: "f3.int.test"
     build:
       context: "./"
     container_name: "interview-accountapi-test"

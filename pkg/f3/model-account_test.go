@@ -2,7 +2,7 @@ package f3_test
 
 import (
 	"github.com/google/uuid"
-	"github.com/xeus2001/interview-accountapi"
+	"github.com/xeus2001/interview-accountapi/pkg/f3"
 	"testing"
 )
 

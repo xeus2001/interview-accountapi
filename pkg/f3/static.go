@@ -9,7 +9,7 @@ import (
 
 var (
 	// DefaultEndPoint is the default endpoint to connect the client to.
-	DefaultEndPoint = flag.String("f3.endpoint", "https://api.form3.tech/v1", "Set the default endpoint")
+	DefaultEndPoint = flag.String("f3.endpoint", "https://api.f3.tech/v1", "Set the default endpoint")
 
 	// DefaultTimeout is the default timeout to be used for the http client.
 	DefaultTimeout = time.Second * 5

@@ -6,12 +6,12 @@ package f3_test
 import (
 	"flag"
 	"fmt"
-	f3 "github.com/xeus2001/interview-accountapi"
+	"github.com/xeus2001/interview-accountapi/pkg/f3"
 	"testing"
 	"time"
 )
 
-var wait = flag.Int("f3.wait", 60, "The time to wait for the account API in seconds")
+var wait = flag.Int("f3.wait", 15, "The time to wait for the account API in seconds")
 
 func TestClient(t *testing.T) {
 	fmt.Printf("Execute integration tests against endpoint: '%s'\n", *f3.DefaultEndPoint)
@@ -21,12 +21,10 @@ func TestClient(t *testing.T) {
 	// Wait for endpoint
 	WAIT_MAX := time.Second * time.Duration(*wait)
 	START := time.Now()
-	fmt.Printf("Wait for Account API to become available ")
+	fmt.Printf("Wait %d seconds for the Account-API to become available ...\n", *wait)
 	for !client.IsHealthy() && time.Since(START) < WAIT_MAX {
-		print(".")
 		time.Sleep(time.Millisecond * 1000)
 	}
-	println()
 	t.Run("IsHealthy", func(t *testing.T) {
 		if !client.IsHealthy() {
 			t.Fatalf("Health check for service failed")

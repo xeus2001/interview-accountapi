@@ -2,6 +2,72 @@
 
 Engineers at Form3 build highly available distributed systems in a microservices environment. Our take home test is designed to evaluate real world activities that are involved with this role. We recognise that this may not be as mentally challenging and may take longer to implement than some algorithmic tests that are often seen in interview exercises. Our approach however helps ensure that you will be working with a team of engineers with the necessary practical skills for the role (as well as a diverse range of technical wizardry). 
 
+## Questions
+
+- German contract?
+- Insurance (Life, Accident)?
+- Confirm to be able to use own hardware?
+- RSU, Stock Options or other short/long term incentives?
+- Working hours? Time Tracker?
+- Job Description that I'm hired for
+
+go test -tags=integration
+
+## Documentation
+
+To generate the documentation first install `gomarkdoc` via:
+
+```bash
+go install github.com/princjef/gomarkdoc/cmd/gomarkdoc@latest
+```
+
+Then execute
+
+go test -v
+go test -v -tags=int
+
+!!!!! ENTRYPOINT vs CMD = https://stackoverflow.com/questions/21553353/what-is-the-difference-between-cmd-and-entrypoint-in-a-dockerfile
+ENTRYPOINT go test -v -tags=int [... hostname]
+
+docker run -t swaggerapi/swagger-ui
+docker run -i -t golang:1.18beta1 bash
+
+docker build . -t form3:test
+docker run -t form3:test
+
+```bash
+gomarkdoc --output doc/f3.md ./
+gomarkdoc --output doc/iso.md ./src/iso/...
+gomarkdoc --output doc/countryCode.md ./src/iso/countryCode/...
+gomarkdoc --output doc/currencyCode.md ./src/iso/currencyCode/...
+
+client := f3.NewClient()
+account := f3.NewAccount(...)
+account, e := client.CreateAccount(account)
+
+```
+
+To read the documentation, just look [here](doc/README.md).
+
+-- test coverage
+go get golang.org/x/tools/cmd/cover
+go tool cover -help
+
+go test f3 -coverprofile=f3.out
+
+## Errors
+
+//
+// Why do I need to URI encode reserved characters that are interpreted? https://datatracker.ietf.org/doc/html/rfc3986#section-2.2
+//
+// curl -v 'http://localhost:8080/v1/organisation/accounts?filter%5Bcustomer_id%5D=test' -H 'accept: application/vnd.api+json'
+// curl -v 'http://localhost:8080/v1/organisation/accounts?filter[customer_id]=test' -H 'accept: application/vnd.api+json'
+// curl -v 'http://localhost:8080/v1/organisation/accounts?filter[customer_id]=test%2Chello' -H 'accept: application/vnd.api+json'
+// curl -v 'http://localhost:8080/v1/organisation/accounts?filter[customer_id]=test,hello' -H 'accept: application/vnd.api+json'
+//
+
+
+
 ## Instructions
 The goal of this exercise is to write a client library in Go to access our fake account API, which is provided as a Docker
 container in the file `docker-compose.yaml` of this repository. Please refer to the
