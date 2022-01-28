@@ -1,8 +1,8 @@
 # Documentation
 
-This folder contains the documentation of the client [f3 package](./f3.md).
+This folder contains the documentation of the [f3 client](./f3.md).
 
-The usage of the client is basically:
+Basically
 
 ```go
 package main

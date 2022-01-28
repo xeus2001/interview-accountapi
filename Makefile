@@ -1,14 +1,15 @@
 GOBIN := $(shell pwd)/bin
 SRC := $(shell find . -type f -name '*.go' -path "./pkg/f3/*")
 VERSION := $(shell cat pkg/f3/version.go |grep "const Version ="|cut -d"\"" -f2)
-GIT_COMMIT := $(shell git rev-parse HEAD)
 LIBNAME := libf3
 EXENAME := f3
 
 build: FLAGS := -ldflags "-X github.com/xeus2001/interview-accountapi/pkg/f3.DefaultEndPoint=http://localhost:8080/v1"
+docker: FLAGS := -ldflags "-X github.com/xeus2001/interview-accountapi/pkg/f3.DefaultEndPoint=http://accountapi:8080/v1"
 release: FLAGS := -ldflags "-X github.com/xeus2001/interview-accountapi/pkg/f3.DefaultEndPoint=https://api.f3.tech/v1"
 
 build: do-build
+docker: do-build
 release: do-build
 
 do-build:
@@ -19,7 +20,7 @@ do-build:
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) GOOS=linux GOARCH=amd64 go build $(FLAGS) -o bin/$(EXENAME) cmd/main.go
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) GOOS=windows GOARCH=amd64 go build $(FLAGS) -o bin/$(EXENAME).exe cmd/main.go
 
-docs: fmt
+doc: fmt
 	gomarkdoc --output doc/f3.md pkg/f3/*.go
 
 open-swagger-ui:
@@ -36,7 +37,8 @@ check:
 	@sh -c "'$(CURDIR)/scripts/fmtcheck.sh'"
 
 get:
-	go get -u github.com/google/uuid
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get -u github.com/google/uuid
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get -u golang.org/x/tools/cmd/cover
 
 clean:
 	@rm -f bin/$(LIBNAME)
@@ -48,9 +50,12 @@ simplify:
 	@gofmt -s -l -w $(SRC)
 
 test:
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go test -v github.com/xeus2001/interview-accountapi/pkg/f3
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go test -cover -v github.com/xeus2001/interview-accountapi/pkg/f3
 
 test-int:
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go test -tags=int -v github.com/xeus2001/interview-accountapi/pkg/f3 -f3.endpoint=http://localhost:8080/v1
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go test -cover -v -tags=int github.com/xeus2001/interview-accountapi/pkg/f3 -f3.endpoint=http://localhost:8080/v1
 
-.PHONY: all build release do-build docs open-swagger-ui fmt check get clean simplify test test-int
+test-docker:
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go test -cover -v -tags=int github.com/xeus2001/interview-accountapi/pkg/f3 -f3.endpoint=http://accountapi:8080/v1
+
+.PHONY: all build release do-build doc open-swagger-ui fmt check get clean simplify test test-int

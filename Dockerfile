@@ -5,11 +5,9 @@ LABEL "author"="Alexander Lowey-Weber <alexander@lowey.family>"
 
 COPY pkg /go/src/pkg
 COPY go.mod /go/src/.
+COPY Makefile /go/src/.
 
 WORKDIR /go/src
+RUN make get
 
-RUN go get github.com/google/uuid
-
-WORKDIR /go/src/pkg/f3
-
-ENTRYPOINT ["go", "test", "-v", "-tags=int"]
+ENTRYPOINT ["make", "test-docker"]
