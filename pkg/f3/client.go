@@ -181,5 +181,15 @@ func (c *Client) DeleteAccount(accountId string, version uint64) Err {
 	if e != nil {
 		return err{code: ErrRequest, msg: "Request failed", cause: e, req: req, resp: resp}
 	}
-	return parseResponse(req, resp, (*any)(nil))
+	if resp == nil {
+		return err{code: ErrRequest, msg: "No response by service", req: req, resp: resp}
+	}
+	if resp.StatusCode == 404 {
+		return err{code: ErrAccountDoesNotExist, msg: "No such account found", req: req, resp: resp}
+	}
+	if resp.StatusCode != 200 && resp.StatusCode != 204 {
+		return err{code: ErrResponse, msg: "Unknown error while trying to delete account", req: req, resp: resp}
+	}
+	// 200 OK
+	return nil
 }

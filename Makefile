@@ -23,7 +23,7 @@ do-build:
 doc: fmt
 	gomarkdoc --output doc/f3.md pkg/f3/*.go
 
-open-swagger-ui:
+swagger-ui:
 	chromium-browser \
       --disable-web-security \
       --user-data-dir="/tmp/chromium-debug/" \
@@ -58,4 +58,4 @@ test-int:
 test-docker:
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go test -cover -v -tags=int github.com/xeus2001/interview-accountapi/pkg/f3 -f3.endpoint=http://accountapi:8080/v1
 
-.PHONY: all build release do-build doc open-swagger-ui fmt check get clean simplify test test-int
+.PHONY: all build release do-build doc swagger-ui fmt check get clean simplify test test-int

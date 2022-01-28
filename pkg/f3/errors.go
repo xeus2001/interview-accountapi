@@ -67,4 +67,7 @@ const (
 
 	// ErrResponse signals that the response is erroneous.
 	ErrResponse int = iota
+
+	// ErrAccountDoesNotExist is returned by delete or fetch account, when no such account exists.
+	ErrAccountDoesNotExist = iota
 )
