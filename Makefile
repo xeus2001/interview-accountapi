@@ -10,9 +10,9 @@ release: FLAGS := -ldflags "-X github.com/xeus2001/interview-accountapi/pkg/f3.D
 
 build: do-build
 docker: do-build
-release: do-build
+release: check do-build
 
-do-build:
+do-build: get
 	@echo "GOPATH: $(GOPATH)"
 	@echo "LDFLAGS: $(FLAGS)"
 	@echo "FILES: $(SRC)"
@@ -37,8 +37,8 @@ check:
 	@sh -c "'$(CURDIR)/scripts/fmtcheck.sh'"
 
 get:
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get -u github.com/google/uuid
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get -u golang.org/x/tools/cmd/cover
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get github.com/google/uuid
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go get golang.org/x/tools/cmd/cover
 
 clean:
 	@rm -f bin/$(LIBNAME)
