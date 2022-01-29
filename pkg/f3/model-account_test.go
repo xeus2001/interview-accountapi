@@ -6,8 +6,8 @@ import (
 	"testing"
 )
 
-func createTestAccount() *f3.Account {
-	return f3.NewAccount(
+func createTestAccount(setIntegrationTestAccountId bool) *f3.Account {
+	account := f3.NewAccount(
 		&f3.DefaultIntegrationOrganizationId,
 		"GB",
 		"400300",
@@ -16,10 +16,14 @@ func createTestAccount() *f3.Account {
 		"41426819",
 		"GBP",
 		"tests")
+	if setIntegrationTestAccountId {
+		account.Id = f3.IntegrationTestAccountId
+	}
+	return account
 }
 
 func TestNewAccount(t *testing.T) {
-	account := createTestAccount()
+	account := createTestAccount(false)
 	if account == nil {
 		t.Fatal("Failed to create account, NewAccount returned nil")
 	}
@@ -75,7 +79,7 @@ func TestNewAccount(t *testing.T) {
 }
 
 func TestAccountAttr_WithStatusClosed(t *testing.T) {
-	account := createTestAccount()
+	account := createTestAccount(false)
 	attr := account.Attr
 	attr.WithStatusClosed("Just for fun")
 	if attr.Status != f3.StatusClosed {
@@ -89,7 +93,7 @@ func TestAccountAttr_WithStatusClosed(t *testing.T) {
 }
 
 func TestAccountAttr_WithStatusFailed(t *testing.T) {
-	account := createTestAccount()
+	account := createTestAccount(false)
 	attr := account.Attr
 	attr.WithStatusFailed()
 	if attr.Status != f3.StatusFailed {
@@ -101,7 +105,7 @@ func TestAccountAttr_WithStatusFailed(t *testing.T) {
 }
 
 func TestAccountAttr_WithStatusConfirmed(t *testing.T) {
-	account := createTestAccount()
+	account := createTestAccount(false)
 	attr := account.Attr
 	attr.WithStatusConfirmed()
 	if attr.Status != f3.StatusConfirmed {
@@ -113,7 +117,7 @@ func TestAccountAttr_WithStatusConfirmed(t *testing.T) {
 }
 
 func TestAccountAttr_WithStatusPending(t *testing.T) {
-	account := createTestAccount()
+	account := createTestAccount(false)
 	attr := account.Attr
 	attr.WithStatusPending()
 	if attr.Status != f3.StatusPending {

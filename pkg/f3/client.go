@@ -3,6 +3,7 @@ package f3
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -83,14 +84,13 @@ func createRequest[T any](method string, uri string, object *T) (*http.Request, 
 	if object != nil {
 		var jsonBytes []byte
 		jsonBytes, e = json.Marshal(object)
-		if e != nil {
-			return nil, err{code: ErrJsonStringify, msg: "Failed to stringify", cause: e}
+		if e == nil {
+			req, e = http.NewRequest(method, uri, bytes.NewBuffer(jsonBytes))
 		}
-		req, e = http.NewRequest(method, uri, bytes.NewBuffer(jsonBytes))
 	} else {
 		req, e = http.NewRequest(method, uri, nil)
 	}
-	if e != nil {
+	if e != nil || req == nil {
 		return nil, err{code: ErrGeneric, msg: "Unknown error while creating the request", cause: e, req: req}
 	}
 	req.Header.Set(headerUserAgent, userAgentName)
@@ -101,95 +101,119 @@ func createRequest[T any](method string, uri string, object *T) (*http.Request, 
 
 // parseResponse parses the JSON of the given response into the given object. If no object is given, no response is expected.
 func parseResponse[T any](req *http.Request, resp *http.Response, object *T) Err {
-	if resp.Body == nil {
-		return err{code: ErrRequest, msg: "Body is nil", req: req, resp: resp}
+	var (
+		e    error
+		body []byte
+	)
+	if object != nil && resp != nil && resp.Body != nil {
+		//goland:noinspection GoUnhandledErrorResult
+		defer resp.Body.Close()
+
+		body, e = ioutil.ReadAll(resp.Body)
+		if e == nil {
+			e = json.Unmarshal(body, object)
+		}
+		if object == nil && body != nil {
+			var errResponse *ErrorResponse
+			e = json.Unmarshal(body, &errResponse)
+			if errResponse != nil {
+				e = errors.New(errResponse.ErrorMessage)
+			}
+		}
+		if resp.StatusCode == 200 || resp.StatusCode == 201 {
+			return nil
+		}
+		if resp.StatusCode == 400 {
+			return err{code: ErrBadRequest, msg: "Bad Request: The given payload was invalid", cause: e, req: req, resp: resp}
+		}
+		if resp.StatusCode == 404 {
+			return err{code: ErrNotFound, msg: "Not found", cause: e, req: req, resp: resp}
+		}
 	}
-	//goland:noinspection GoUnhandledErrorResult
-	defer resp.Body.Close()
-	body, e := ioutil.ReadAll(resp.Body)
-	if e != nil {
-		return err{code: ErrRequest, msg: "Failed to read bytes of returned body", cause: e, req: req, resp: resp}
+	return err{code: ErrResponse, msg: "Invalid service response", cause: e, req: req, resp: resp}
+}
+
+// CreateAccount creates the given account and returns the new account as returned from the server or an error, when
+// the account creation failed.
+func (c *Client) CreateAccount(account *Account) (*Account, Err) {
+	var (
+		req  *http.Request
+		resp *http.Response
+		er   Err
+		e    error
+	)
+	if account != nil {
+		envelope := AccountEnvelope{account}
+		req, er = createRequest(http.MethodPost, c.accountUri, &envelope)
+		if er == nil && req != nil {
+			resp, e = c.httpClient.Do(req)
+			if e == nil && resp != nil {
+				er = parseResponse(req, resp, &envelope)
+				if er == nil && envelope.Data != nil {
+					return envelope.Data, nil
+				}
+			}
+		}
 	}
-	if object == nil {
+	if er != nil {
+		return nil, er
+	}
+	return nil, err{code: ErrRequest, msg: "Request failed", cause: e, req: req, resp: resp}
+}
+
+// FetchAccount returns the account with the given id or ErrNotFound if the account does not exist.
+func (c *Client) FetchAccount(accountId string) (*Account, Err) {
+	var (
+		req  *http.Request
+		resp *http.Response
+		er   Err
+		e    error
+	)
+	uri := fmt.Sprintf("%s/%s", c.accountUri, url.QueryEscape(accountId))
+	req, er = createRequest(http.MethodGet, uri, (*any)(nil))
+	if er == nil && req != nil {
+		resp, e = c.httpClient.Do(req)
+		if e == nil && resp != nil {
+			var envelope AccountEnvelope
+			er = parseResponse(req, resp, &envelope)
+			if er == nil && envelope.Data != nil {
+				return envelope.Data, nil
+			}
+		}
+	}
+	if er != nil {
+		return nil, er
+	}
+	return nil, err{code: ErrRequest, msg: "Request failed", cause: e, req: req, resp: resp}
+}
+
+// DeleteAccount deletes the account with the given id and return nil. If the account does not exist, ErrNotFound is
+// returned.
+func (c *Client) DeleteAccount(accountId string, version uint64) Err {
+	var (
+		req  *http.Request
+		resp *http.Response
+		er   Err
+		e    error
+	)
+	uri := fmt.Sprintf("%s/%s?version=%d", c.accountUri, url.QueryEscape(accountId), version)
+	req, er = createRequest(http.MethodDelete, uri, (*any)(nil))
+	if er == nil && req != nil {
+		resp, e = c.httpClient.Do(req)
+		if e == nil && resp != nil {
+			if resp.StatusCode >= 200 && resp.StatusCode <= 300 {
+				return nil
+			}
+			if resp.StatusCode == 409 {
+				return err{code: ErrConflict, msg: "Conflict, version does not match", req: req, resp: resp}
+			}
+			if resp.StatusCode == 404 {
+				return err{code: ErrNotFound, msg: "Account does not exist", req: req, resp: resp}
+			}
+		}
+	}
+	if er != nil {
 		return nil
 	}
-	e = json.Unmarshal(body, object)
-	if e != nil {
-		var errResponse *ErrorResponse
-		e2 := json.Unmarshal(body, &errResponse)
-		if e2 != nil {
-			return err{code: ErrJsonParse, msg: "Failed to parse response", cause: e, req: req, resp: resp}
-		}
-		return err{code: ErrResponse, msg: errResponse.ErrorMessage, cause: e, req: req, resp: resp}
-	}
-	return nil
-}
-
-// CreateAccount creates the given account and returns the server response or an error, when the account creation
-// failed.
-func (c *Client) CreateAccount(account *Account) (*Account, Err) {
-	if account == nil {
-		return nil, err{code: ErrGeneric, msg: "Account is nil"}
-	}
-	envelope := AccountEnvelope{account}
-	req, err0 := createRequest(http.MethodPost, c.accountUri, &envelope)
-	if err0 != nil {
-		return nil, err0
-	}
-	resp, e := c.httpClient.Do(req)
-	if e != nil {
-		return nil, err{code: ErrRequest, msg: "Request failed", cause: e, req: req, resp: resp}
-	}
-	err0 = parseResponse(req, resp, &envelope)
-	if err0 != nil {
-		return nil, err0
-	}
-	if envelope.Data == nil {
-		return nil, err{code: ErrResponse, msg: "Received an empty envelope", req: req, resp: resp}
-	}
-	return envelope.Data, nil
-}
-
-func (c *Client) FetchAccount(accountId string) (*Account, Err) {
-	uri := fmt.Sprintf("%s/%s", c.accountUri, url.QueryEscape(accountId))
-	req, err0 := createRequest(http.MethodGet, uri, (*any)(nil))
-	if err0 != nil {
-		return nil, err0
-	}
-	resp, e := c.httpClient.Do(req)
-	if e != nil {
-		return nil, err{code: ErrRequest, msg: "Request failed", cause: e, req: req, resp: resp}
-	}
-	var envelope AccountEnvelope
-	err0 = parseResponse(req, resp, &envelope)
-	if err0 != nil {
-		return nil, err0
-	}
-	if envelope.Data == nil {
-		return nil, err{code: ErrResponse, msg: "Received an empty envelope", req: req, resp: resp}
-	}
-	return envelope.Data, nil
-}
-
-func (c *Client) DeleteAccount(accountId string, version uint64) Err {
-	uri := fmt.Sprintf("%s/%s?version=%d", c.accountUri, url.QueryEscape(accountId), version)
-	req, err0 := createRequest(http.MethodDelete, uri, (*any)(nil))
-	if err0 != nil {
-		return err0
-	}
-	resp, e := c.httpClient.Do(req)
-	if e != nil {
-		return err{code: ErrRequest, msg: "Request failed", cause: e, req: req, resp: resp}
-	}
-	if resp == nil {
-		return err{code: ErrRequest, msg: "No response by service", req: req, resp: resp}
-	}
-	if resp.StatusCode == 404 {
-		return err{code: ErrAccountDoesNotExist, msg: "No such account found", req: req, resp: resp}
-	}
-	if resp.StatusCode != 200 && resp.StatusCode != 204 {
-		return err{code: ErrResponse, msg: "Unknown error while trying to delete account", req: req, resp: resp}
-	}
-	// 200 OK
-	return nil
+	return err{code: ErrRequest, msg: "Request failed", cause: e, req: req, resp: resp}
 }

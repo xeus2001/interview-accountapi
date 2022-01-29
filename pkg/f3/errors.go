@@ -56,18 +56,18 @@ const (
 	// ErrGeneric signals a generic error.
 	ErrGeneric int = iota
 
-	// ErrJsonStringify signals that serialization to JSON failed.
-	ErrJsonStringify int = iota
-
-	// ErrJsonParse signals that the JSON parsing failed.
-	ErrJsonParse int = iota
-
 	// ErrRequest signals that the request failed.
 	ErrRequest int = iota
 
 	// ErrResponse signals that the response is erroneous.
 	ErrResponse int = iota
 
-	// ErrAccountDoesNotExist is returned by delete or fetch account, when no such account exists.
-	ErrAccountDoesNotExist = iota
+	// ErrNotFound is returned when a resource is not found, for example for delete or fetch account.
+	ErrNotFound = iota
+
+	// ErrBadRequest is returned when the request is bad, for example provided account data does have errors.
+	ErrBadRequest = iota
+
+	// ErrConflict is returned when an invalid version was provided given, normally this means concurrent access.
+	ErrConflict = iota
 )

@@ -14,6 +14,21 @@ for me and nice to have some dedicated learning goal!
 
 The client library documentation can be found [here](doc/README.md).
 
+## Go 1.18
+
+The code does uses generics, which are part of Go 1.18, therefore to build the code Go 1.18 is required. In most 
+64-bit x86 Linux systems the installation can be done like:
+
+```bash
+cd ~/Downloads/
+curl -LO https://go.dev/dl/go1.18beta1.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.18beta1.linux-amd64.tar.gz
+mkdir ~/go
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/go
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+```
+
 ## Docker
 
 The library comes with a docker stack that can be started using `docker-compose up` (as requested in the _Shoulds_).
