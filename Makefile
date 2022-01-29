@@ -44,6 +44,7 @@ clean:
 	@rm -f bin/$(LIBNAME)
 	@rm -f bin/$(EXENAME)
 	@rm -f bin/$(EXENAME).exe
+	@rm -f coverage.out
 	@docker image rm f3.int.test:latest 2>/dev/null || true
 
 simplify:
@@ -53,7 +54,10 @@ test:
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go test -cover -v github.com/xeus2001/interview-accountapi/pkg/f3
 
 test-int:
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go test -cover -v -tags=int github.com/xeus2001/interview-accountapi/pkg/f3 -f3.endpoint=http://localhost:8080/v1
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go test -cover -coverprofile=coverage.out -v -tags=int github.com/xeus2001/interview-accountapi/pkg/f3 -f3.endpoint=http://localhost:8080/v1
+
+test-int-result:
+	@go tool cover -html=coverage.out
 
 test-docker:
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go test -cover -v -tags=int github.com/xeus2001/interview-accountapi/pkg/f3 -f3.endpoint=http://accountapi:8080/v1

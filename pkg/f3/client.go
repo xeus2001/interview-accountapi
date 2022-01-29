@@ -90,13 +90,13 @@ func createRequest[T any](method string, uri string, object *T) (*http.Request, 
 	} else {
 		req, e = http.NewRequest(method, uri, nil)
 	}
-	if e != nil || req == nil {
-		return nil, err{code: ErrGeneric, msg: "Unknown error while creating the request", cause: e, req: req}
+	if e == nil && req != nil {
+		req.Header.Set(headerUserAgent, userAgentName)
+		req.Header.Set(headerContentType, mimeForm3Json)
+		req.Header.Set(headerAccept, mimeForm3Json)
+		return req, nil
 	}
-	req.Header.Set(headerUserAgent, userAgentName)
-	req.Header.Set(headerContentType, mimeForm3Json)
-	req.Header.Set(headerAccept, mimeForm3Json)
-	return req, nil
+	return nil, err{code: ErrGeneric, msg: "Unknown error while creating the request", cause: e, req: req}
 }
 
 // parseResponse parses the JSON of the given response into the given object. If no object is given, no response is expected.
@@ -105,32 +105,27 @@ func parseResponse[T any](req *http.Request, resp *http.Response, object *T) Err
 		e    error
 		body []byte
 	)
-	if object != nil && resp != nil && resp.Body != nil {
-		//goland:noinspection GoUnhandledErrorResult
-		defer resp.Body.Close()
+	//goland:noinspection GoUnhandledErrorResult
+	defer resp.Body.Close()
 
-		body, e = ioutil.ReadAll(resp.Body)
-		if e == nil {
-			e = json.Unmarshal(body, object)
-		}
-		if object == nil && body != nil {
-			var errResponse *ErrorResponse
-			e = json.Unmarshal(body, &errResponse)
-			if errResponse != nil {
-				e = errors.New(errResponse.ErrorMessage)
-			}
-		}
-		if resp.StatusCode == 200 || resp.StatusCode == 201 {
-			return nil
-		}
-		if resp.StatusCode == 400 {
-			return err{code: ErrBadRequest, msg: "Bad Request: The given payload was invalid", cause: e, req: req, resp: resp}
-		}
-		if resp.StatusCode == 404 {
-			return err{code: ErrNotFound, msg: "Not found", cause: e, req: req, resp: resp}
+	body, e = ioutil.ReadAll(resp.Body)
+	if e == nil {
+		e = json.Unmarshal(body, object)
+	}
+	if resp.StatusCode == 200 || resp.StatusCode == 201 {
+		return nil
+	}
+	if body != nil {
+		var errResponse *ErrorResponse
+		e = json.Unmarshal(body, &errResponse)
+		if errResponse != nil {
+			e = errors.New(errResponse.ErrorMessage)
 		}
 	}
-	return err{code: ErrResponse, msg: "Invalid service response", cause: e, req: req, resp: resp}
+	if resp.StatusCode == 404 {
+		return err{code: ErrNotFound, msg: "Not found", cause: e, req: req, resp: resp}
+	}
+	return err{code: ErrBadRequest, msg: "Bad Request: The given payload was invalid", cause: e, req: req, resp: resp}
 }
 
 // CreateAccount creates the given account and returns the new account as returned from the server or an error, when
@@ -213,7 +208,7 @@ func (c *Client) DeleteAccount(accountId string, version uint64) Err {
 		}
 	}
 	if er != nil {
-		return nil
+		return er
 	}
 	return err{code: ErrRequest, msg: "Request failed", cause: e, req: req, resp: resp}
 }

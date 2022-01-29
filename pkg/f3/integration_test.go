@@ -68,8 +68,40 @@ func TestClient(t *testing.T) {
 		}
 	})
 
-	// Test the unhappy paths.
-	brokenClient := f3.NewClient().WithEndPoint("http://localhost:0/v1")
+	brokenClient := f3.NewClient()
+	brokenClient.WithEndPoint("tj48\031fnf234f234f342")
+	t.Run("CreateAccountWithInvalidEndPointURL@BROKEN", func(t *testing.T) {
+		account := f3.NewAccount(
+			nil,
+			"GB",
+			"400300",
+			"GBDSC",
+			"Alexander Lowey-Weber",
+			"41426819",
+			"GBP",
+			"tests")
+		created, e := brokenClient.CreateAccount(account)
+		if created != nil {
+			t.Fatalf("Create an account with ID '%s', this should not be possible", account.Id)
+		}
+		if e == nil {
+			t.Fatalf("Missing error")
+		}
+		if e.ErrorCode() != f3.ErrGeneric {
+			t.Errorf("Invalid error, expected %d, got %d", f3.ErrGeneric, e.ErrorCode())
+		}
+	})
+	t.Run("DeleteAccountWithInvalidEndPointURL@BROKEN", func(t *testing.T) {
+		e := brokenClient.DeleteAccount("4711", 12)
+		if e == nil {
+			t.Fatalf("Missing error")
+		}
+		if e.ErrorCode() != f3.ErrGeneric {
+			t.Errorf("Invalid error, expected %d, got %d", f3.ErrGeneric, e.ErrorCode())
+		}
+	})
+
+	brokenClient.WithEndPoint("http://localhost:0/v1")
 	if brokenClient.IsHealthy() {
 		t.Fatalf("The borken client must not be healthy")
 	}
@@ -99,6 +131,16 @@ func TestClient(t *testing.T) {
 		}
 		if e.ErrorCode() != f3.ErrBadRequest {
 			t.Errorf("Invalid error, expected %d, got %d", f3.ErrBadRequest, e.ErrorCode())
+		}
+		if e.Request() == nil {
+			t.Errorf("The request is missing")
+		}
+		if e.Error() == "" {
+			t.Errorf("Error message missing")
+		}
+		cause := e.Unwrap()
+		if cause == nil {
+			t.Errorf("Unexpected cause")
 		}
 	})
 	t.Run("CreateAccountWithNil", func(t *testing.T) {

@@ -40,6 +40,7 @@ The following options are available:
 - `make`: Create the library and demo binaries for the local docker stack (endpoint: `http://localhost:8080/v1`).
 - `make test`: Run standard tests.
 - `make test-int`: Run integration tests against docker stack.
+- `make test-int-result`: Shows the test coverage as HTML file in the browser.
 - `make release`: Create the library and binaries for production (endpoint: `https://api.f3.tech/v1`).
 - `make clean`: Remove all build artifacts.
 - `make doc`: Generate the documentation in the [doc/](doc/README.md) folder.

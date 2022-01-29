@@ -28,10 +28,6 @@ type err struct {
 	resp  *http.Response
 }
 
-func errAddr(e err) *err {
-	return &e
-}
-
 func (e err) Request() *http.Request {
 	return e.req
 }
