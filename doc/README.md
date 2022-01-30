@@ -36,5 +36,5 @@ func main() {
 
 The source code is committed in [cmd/cmd.go](cmd/cmd.go). To build and run it, just do `make clean && make && bin/f3`.
 
-Do make more sophisticated accounts, please either directly create a new fresh account or simply modify the generated 
+To make more sophisticated accounts, please either directly create a new fresh account or simply modify the generated 
 template. For more information see the documentation of the [f3 client library](./f3.md). 
